@@ -239,6 +239,12 @@ export default function WhiskeyBottles() {
     let currentRotationY = 0;
     let currentRotationX = 0;
 
+    // Zoom interaction
+    let targetZoom = 5; // Initial camera z position
+    let currentZoom = 5;
+    const minZoom = 2.5; // Closest zoom
+    const maxZoom = 10; // Farthest zoom
+
     const onMouseDown = (event) => {
       isDragging = true;
       previousMouseX = event.clientX;
@@ -262,7 +268,15 @@ export default function WhiskeyBottles() {
       targetRotationX = 0;
     };
 
+    const onWheel = (event) => {
+      event.preventDefault();
+      const zoomSpeed = 0.002;
+      targetZoom += event.deltaY * zoomSpeed;
+      targetZoom = Math.max(minZoom, Math.min(maxZoom, targetZoom));
+    };
+
     containerRef.current.addEventListener('mousedown', onMouseDown);
+    containerRef.current.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
 
@@ -288,9 +302,11 @@ export default function WhiskeyBottles() {
 
       currentRotationY += (targetRotationY - currentRotationY) * 0.1;
       currentRotationX += (targetRotationX - currentRotationX) * 0.1;
+      currentZoom += (targetZoom - currentZoom) * 0.1;
 
       bottleGroup.rotation.y = currentRotationY;
       bottleGroup.rotation.x = currentRotationX;
+      camera.position.z = currentZoom;
 
       // Keep surface level relative to world by setting a WORLD target and converting to LOCAL
       bottleGroup.updateMatrixWorld(true);
@@ -336,7 +352,10 @@ export default function WhiskeyBottles() {
 
     // Cleanup
     return () => {
-      window.removeEventListener('mousedown', onMouseDown);
+      if (containerRef.current) {
+        containerRef.current.removeEventListener('mousedown', onMouseDown);
+        containerRef.current.removeEventListener('wheel', onWheel);
+      }
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
       window.removeEventListener('resize', handleResize);
@@ -393,7 +412,7 @@ export default function WhiskeyBottles() {
     <S.Container>
       <S.Title>Liquor Collection</S.Title>
       <S.Description>
-        Click liquor name to learn more • Drag to rotate bottles
+        Click liquor name to learn more • Drag to rotate • Scroll to zoom
       </S.Description>
       
       <S.GridContainer>
