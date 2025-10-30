@@ -266,6 +266,21 @@ export default function WhiskeyBottles() {
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
 
+    // Handle window resize
+    const handleResize = () => {
+      if (!containerRef.current) return;
+      
+      const width = containerRef.current.clientWidth;
+      const height = containerRef.current.clientHeight;
+      
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      
+      renderer.setSize(width, height);
+    };
+    
+    window.addEventListener('resize', handleResize);
+
     // Animation
     let animationFrameId;
     const animate = () => {
@@ -324,6 +339,7 @@ export default function WhiskeyBottles() {
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
       if (containerRef.current && renderer.domElement) {
         containerRef.current.removeChild(renderer.domElement);
