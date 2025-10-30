@@ -92,19 +92,8 @@ export default function WhiskeyBottles() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedLiquor, setSelectedLiquor] = useState(null);
 
-  useEffect(() => {
-    const bottles = [
-      { ref: section1Ref, name: 'Bourbon', liquidColor: LIQUOR_INFO['Bourbon'].color, bgColor: 0x3E1F1F },
-      { ref: section2Ref, name: 'Irish Whiskey', liquidColor: LIQUOR_INFO['Irish Whiskey'].color, bgColor: 0x4A2424 },
-      { ref: section3Ref, name: 'Scotch', liquidColor: LIQUOR_INFO['Scotch'].color, bgColor: 0x2F1818 },
-      { ref: section4Ref, name: 'Rye', liquidColor: LIQUOR_INFO['Rye'].color, bgColor: 0x352020 },
-      { ref: section5Ref, name: 'Cognac', liquidColor: LIQUOR_INFO['Cognac'].color, bgColor: 0x2B1F1F },
-      { ref: section6Ref, name: 'Rum', liquidColor: LIQUOR_INFO['Rum'].color, bgColor: 0x3A1F1F },
-      { ref: section7Ref, name: 'Tequila', liquidColor: LIQUOR_INFO['Tequila'].color, bgColor: 0x4F3A2A },
-      { ref: section8Ref, name: 'Vodka', liquidColor: LIQUOR_INFO['Vodka'].color, bgColor: 0x2F2F2F },
-    ];
-
-    const setupBottle = (containerRef, liquidColor, bgColor) => {
+  // Setup bottle function - shared by both grid and modal
+  const setupBottle = (containerRef, liquidColor, bgColor) => {
       if (!containerRef.current) return null;
 
       // Scene with color from palette
@@ -343,7 +332,19 @@ export default function WhiskeyBottles() {
       };
     };
 
-    // Setup all bottles
+  // Setup all grid bottles
+  useEffect(() => {
+    const bottles = [
+      { ref: section1Ref, name: 'Bourbon', liquidColor: LIQUOR_INFO['Bourbon'].color, bgColor: 0x3E1F1F },
+      { ref: section2Ref, name: 'Irish Whiskey', liquidColor: LIQUOR_INFO['Irish Whiskey'].color, bgColor: 0x4A2424 },
+      { ref: section3Ref, name: 'Scotch', liquidColor: LIQUOR_INFO['Scotch'].color, bgColor: 0x2F1818 },
+      { ref: section4Ref, name: 'Rye', liquidColor: LIQUOR_INFO['Rye'].color, bgColor: 0x352020 },
+      { ref: section5Ref, name: 'Cognac', liquidColor: LIQUOR_INFO['Cognac'].color, bgColor: 0x2B1F1F },
+      { ref: section6Ref, name: 'Rum', liquidColor: LIQUOR_INFO['Rum'].color, bgColor: 0x3A1F1F },
+      { ref: section7Ref, name: 'Tequila', liquidColor: LIQUOR_INFO['Tequila'].color, bgColor: 0x4F3A2A },
+      { ref: section8Ref, name: 'Vodka', liquidColor: LIQUOR_INFO['Vodka'].color, bgColor: 0x2F2F2F },
+    ];
+
     const cleanups = bottles.map(bottle => setupBottle(bottle.ref, bottle.liquidColor, bottle.bgColor)).filter(c => c);
 
     return () => {
