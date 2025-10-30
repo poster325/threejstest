@@ -1,6 +1,82 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import * as S from './styles';
+
+// Liquor information data
+const LIQUOR_INFO = {
+  'Bourbon': {
+    origin: 'United States (Kentucky)',
+    type: 'Whiskey',
+    abv: '40-50%',
+    color: 0xD97D28, // Rich amber copper
+    aging: 'Minimum 2 years in new charred oak barrels',
+    taste: 'Sweet caramel, vanilla, oak with hints of corn',
+    description: 'An American classic, bourbon must be made from at least 51% corn and aged in new charred oak barrels, giving it a distinctive sweet and smoky character.'
+  },
+  'Irish Whiskey': {
+    origin: 'Ireland',
+    type: 'Whiskey',
+    abv: '40-46%',
+    color: 0xE8B84D, // Light golden honey
+    aging: 'Minimum 3 years in wooden casks',
+    taste: 'Smooth, light, slightly sweet with hints of honey and vanilla',
+    description: 'Known for its exceptionally smooth character, Irish whiskey is typically triple-distilled and aged for at least three years, resulting in a gentle, approachable spirit.'
+  },
+  'Scotch': {
+    origin: 'Scotland',
+    type: 'Whisky',
+    abv: '40-46%',
+    color: 0x8B5A2B, // Dark mahogany amber
+    aging: 'Minimum 3 years in oak casks',
+    taste: 'Complex, smoky, peaty with hints of dried fruit and spice',
+    description: 'A protected designation spirit that must be distilled and matured in Scotland. Single malts offer regional character from Highland, Speyside, Islay, and other regions.'
+  },
+  'Rye': {
+    origin: 'United States & Canada',
+    type: 'Whiskey',
+    abv: '40-50%',
+    color: 0xB8651B, // Deep amber with reddish tint
+    aging: 'Varies, often 4-7 years',
+    taste: 'Spicy, peppery, bold with hints of fruit and grain',
+    description: 'Made from at least 51% rye grain, this whiskey offers a spicier, more assertive flavor profile than bourbon, making it a favorite for classic cocktails.'
+  },
+  'Cognac': {
+    origin: 'Cognac, France',
+    type: 'Brandy',
+    abv: '40%',
+    color: 0xC49849, // Rich golden brown
+    aging: 'VS: 2 years, VSOP: 4 years, XO: 10+ years',
+    taste: 'Rich, fruity, floral with notes of vanilla, spice, and dried fruit',
+    description: 'A prestigious brandy from the Cognac region of France, double-distilled from white wine and aged in Limousin oak barrels, offering unparalleled elegance and complexity.'
+  },
+  'Rum': {
+    origin: 'Caribbean & Latin America',
+    type: 'Rum',
+    abv: '40-50%',
+    color: 0x6B3410, // Dark caramel brown
+    aging: 'Varies from unaged to 20+ years',
+    taste: 'Sweet molasses, tropical fruit, caramel with oak and spice',
+    description: 'Distilled from sugarcane or molasses, rum ranges from light and crisp to dark and full-bodied, embodying the spirit of tropical regions with its sweet, complex flavors.'
+  },
+  'Tequila': {
+    origin: 'Jalisco, Mexico',
+    type: 'Tequila',
+    abv: '38-40%',
+    color: 0xF4E4C1, // Light straw gold (Reposado)
+    aging: 'Blanco: unaged, Reposado: 2-12 months, Añejo: 1-3 years',
+    taste: 'Agave-forward, earthy, citrus with pepper and herbal notes',
+    description: 'Made exclusively from blue agave in designated regions of Mexico, tequila offers a unique flavor profile ranging from crisp and vegetal to rich and oaky depending on aging.'
+  },
+  'Vodka': {
+    origin: 'Russia & Eastern Europe',
+    type: 'Vodka',
+    abv: '37.5-50%',
+    color: 0xF0F0F0, // Crystal clear (very light gray for visibility)
+    aging: 'Not aged',
+    taste: 'Neutral, clean, subtle grain or potato sweetness',
+    description: 'The epitome of purity and refinement, vodka is distilled to a high proof and filtered to achieve a clean, neutral spirit perfect for cocktails or enjoying ice-cold.'
+  }
+};
 
 export default function WhiskeyBottles() {
   const section1Ref = useRef(null);
@@ -11,17 +87,21 @@ export default function WhiskeyBottles() {
   const section6Ref = useRef(null);
   const section7Ref = useRef(null);
   const section8Ref = useRef(null);
+  const modalBottleRef = useRef(null);
+  
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedLiquor, setSelectedLiquor] = useState(null);
 
   useEffect(() => {
     const bottles = [
-      { ref: section1Ref, name: 'Bourbon', liquidColor: 0xD2850F, bgColor: 0x3E1F1F },
-      { ref: section2Ref, name: 'Irish Whiskey', liquidColor: 0xE5D4B5, bgColor: 0x4A2424 },
-      { ref: section3Ref, name: 'Scotch', liquidColor: 0xA67C52, bgColor: 0x2F1818 },
-      { ref: section4Ref, name: 'Rye', liquidColor: 0x6B3410, bgColor: 0x352020 },
-      { ref: section5Ref, name: 'Cognac', liquidColor: 0xB8860B, bgColor: 0x2B1F1F },
-      { ref: section6Ref, name: 'Rum', liquidColor: 0x8B4513, bgColor: 0x3A1F1F },
-      { ref: section7Ref, name: 'Tequila', liquidColor: 0xF5DEB3, bgColor: 0x4F3A2A },
-      { ref: section8Ref, name: 'Vodka', liquidColor: 0xE0E0E0, bgColor: 0x2F2F2F },
+      { ref: section1Ref, name: 'Bourbon', liquidColor: LIQUOR_INFO['Bourbon'].color, bgColor: 0x3E1F1F },
+      { ref: section2Ref, name: 'Irish Whiskey', liquidColor: LIQUOR_INFO['Irish Whiskey'].color, bgColor: 0x4A2424 },
+      { ref: section3Ref, name: 'Scotch', liquidColor: LIQUOR_INFO['Scotch'].color, bgColor: 0x2F1818 },
+      { ref: section4Ref, name: 'Rye', liquidColor: LIQUOR_INFO['Rye'].color, bgColor: 0x352020 },
+      { ref: section5Ref, name: 'Cognac', liquidColor: LIQUOR_INFO['Cognac'].color, bgColor: 0x2B1F1F },
+      { ref: section6Ref, name: 'Rum', liquidColor: LIQUOR_INFO['Rum'].color, bgColor: 0x3A1F1F },
+      { ref: section7Ref, name: 'Tequila', liquidColor: LIQUOR_INFO['Tequila'].color, bgColor: 0x4F3A2A },
+      { ref: section8Ref, name: 'Vodka', liquidColor: LIQUOR_INFO['Vodka'].color, bgColor: 0x2F2F2F },
     ];
 
     const setupBottle = (containerRef, liquidColor, bgColor) => {
@@ -263,7 +343,7 @@ export default function WhiskeyBottles() {
       };
     };
 
-    // Setup all four bottles
+    // Setup all bottles
     const cleanups = bottles.map(bottle => setupBottle(bottle.ref, bottle.liquidColor, bottle.bgColor)).filter(c => c);
 
     return () => {
@@ -271,55 +351,115 @@ export default function WhiskeyBottles() {
     };
   }, []);
 
+  // Setup modal bottle when modal opens
+  useEffect(() => {
+    if (!modalOpen || !selectedLiquor) return;
+
+    const info = LIQUOR_INFO[selectedLiquor];
+    const cleanup = setupBottle(modalBottleRef, info.color, 0x1a1a1a);
+
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [modalOpen, selectedLiquor]);
+
+  const handleLiquorClick = (name) => {
+    setSelectedLiquor(name);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
   return (
     <S.Container>
       <S.Title>Liquor Collection</S.Title>
       <S.Description>
-        Click and drag to rotate • Release to return
+        Click liquor name to learn more • Drag to rotate bottles
       </S.Description>
       
       <S.GridContainer>
         <S.Section>
-          <S.SectionLabel>Bourbon</S.SectionLabel>
+          <S.SectionLabel onClick={() => handleLiquorClick('Bourbon')}>Bourbon</S.SectionLabel>
           <S.CanvasContainer ref={section1Ref} />
         </S.Section>
 
         <S.Section>
-          <S.SectionLabel>Irish Whiskey</S.SectionLabel>
+          <S.SectionLabel onClick={() => handleLiquorClick('Irish Whiskey')}>Irish Whiskey</S.SectionLabel>
           <S.CanvasContainer ref={section2Ref} />
         </S.Section>
 
         <S.Section>
-          <S.SectionLabel>Scotch</S.SectionLabel>
+          <S.SectionLabel onClick={() => handleLiquorClick('Scotch')}>Scotch</S.SectionLabel>
           <S.CanvasContainer ref={section3Ref} />
         </S.Section>
 
         <S.Section>
-          <S.SectionLabel>Rye</S.SectionLabel>
+          <S.SectionLabel onClick={() => handleLiquorClick('Rye')}>Rye</S.SectionLabel>
           <S.CanvasContainer ref={section4Ref} />
         </S.Section>
 
         <S.Section>
-          <S.SectionLabel>Cognac</S.SectionLabel>
+          <S.SectionLabel onClick={() => handleLiquorClick('Cognac')}>Cognac</S.SectionLabel>
           <S.CanvasContainer ref={section5Ref} />
         </S.Section>
 
         <S.Section>
-          <S.SectionLabel>Rum</S.SectionLabel>
+          <S.SectionLabel onClick={() => handleLiquorClick('Rum')}>Rum</S.SectionLabel>
           <S.CanvasContainer ref={section6Ref} />
         </S.Section>
 
         <S.Section>
-          <S.SectionLabel>Tequila</S.SectionLabel>
+          <S.SectionLabel onClick={() => handleLiquorClick('Tequila')}>Tequila</S.SectionLabel>
           <S.CanvasContainer ref={section7Ref} />
         </S.Section>
 
         <S.Section>
-          <S.SectionLabel>Vodka</S.SectionLabel>
+          <S.SectionLabel onClick={() => handleLiquorClick('Vodka')}>Vodka</S.SectionLabel>
           <S.CanvasContainer ref={section8Ref} />
         </S.Section>
       </S.GridContainer>
 
+      {modalOpen && selectedLiquor && (
+        <S.ModalOverlay onClick={handleCloseModal}>
+          <S.ModalContent onClick={(e) => e.stopPropagation()}>
+            <S.ModalClose onClick={handleCloseModal}>&times;</S.ModalClose>
+            <S.ModalBody>
+              <S.ModalLeft>
+                <S.ModalBottleContainer ref={modalBottleRef} />
+              </S.ModalLeft>
+              <S.ModalRight>
+                <S.ModalTitle>{selectedLiquor}</S.ModalTitle>
+                <S.InfoSection>
+                  <S.InfoLabel>Origin</S.InfoLabel>
+                  <S.InfoValue>{LIQUOR_INFO[selectedLiquor].origin}</S.InfoValue>
+                </S.InfoSection>
+                <S.InfoSection>
+                  <S.InfoLabel>Type</S.InfoLabel>
+                  <S.InfoValue>{LIQUOR_INFO[selectedLiquor].type}</S.InfoValue>
+                </S.InfoSection>
+                <S.InfoSection>
+                  <S.InfoLabel>Alcohol by Volume</S.InfoLabel>
+                  <S.InfoValue>{LIQUOR_INFO[selectedLiquor].abv}</S.InfoValue>
+                </S.InfoSection>
+                <S.InfoSection>
+                  <S.InfoLabel>Aging</S.InfoLabel>
+                  <S.InfoValue>{LIQUOR_INFO[selectedLiquor].aging}</S.InfoValue>
+                </S.InfoSection>
+                <S.InfoSection>
+                  <S.InfoLabel>Taste Profile</S.InfoLabel>
+                  <S.InfoValue>{LIQUOR_INFO[selectedLiquor].taste}</S.InfoValue>
+                </S.InfoSection>
+                <S.InfoSection>
+                  <S.InfoLabel>Description</S.InfoLabel>
+                  <S.InfoValue>{LIQUOR_INFO[selectedLiquor].description}</S.InfoValue>
+                </S.InfoSection>
+              </S.ModalRight>
+            </S.ModalBody>
+          </S.ModalContent>
+        </S.ModalOverlay>
+      )}
     </S.Container>
   );
 }
